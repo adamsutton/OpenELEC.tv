@@ -137,7 +137,7 @@ trap "rm -f $LOCK_PATH" EXIT
 touch $LOCK_PATH
 
 # sleep a bit, maybe we have a lot of work ;-)
-#usleep 30000000
+[ -z "$QUICK" ] && usleep 30000000
 
 # getting this version
 THIS_DISTRIBUTION="`cat /etc/distribution`"
@@ -146,10 +146,13 @@ THIS_VERSION="`cat /etc/version`"
 
 # get infofile with the latest released version
 rm -rf $TMP_DIR/latest
-download "$UPDATEURL/latest" "$TMP_DIR/latest"
+download "$UPDATEURL/latest" "$TMP_DIR/latest" || exit 1
 
 NEW_IMAGE="`cat $TMP_DIR/latest |grep "$THIS_DISTRIBUTION-$THIS_ARCH"`"
 NEW_VERSION="`echo "$NEW_IMAGE" | cut -d "-" -f3-`"
+
+[ -z "$NEW_IMAGE" ] && exit 1
+[ -z "$NEW_VERSION" ] && exit 1
 
 rm -rf $TMP_DIR/latest
 
@@ -172,7 +175,7 @@ elif [ "$AUTOUPDATE" = "auto" ]; then
   # downloading the new version
   rm -rf $TMP_DIR/$NEW_IMAGE.tar.bz2
   trap "rm -f $LOCK_PATH $TMP_DIR/$NEW_IMAGE*" EXIT
-  download "$UPDATEURL/$NEW_IMAGE.tar.bz2" "$TMP_DIR/$NEW_IMAGE.tar.bz2"
+  download "$UPDATEURL/$NEW_IMAGE.tar.bz2" "$TMP_DIR/$NEW_IMAGE.tar.bz2" || exit 1
 
   # extract the image
   rm -rf $TMP_DIR/$NEW_IMAGE
