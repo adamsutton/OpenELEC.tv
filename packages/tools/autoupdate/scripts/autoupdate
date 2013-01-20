@@ -85,7 +85,7 @@ check_version () {
     fi
 
     # Already up to date
-    if [ $NEW_VERSION -lt $CUR_VERSION ]; then
+    if [ $NEW_VERSION -le $CUR_VERSION ]; then
       AUTOUPDATE="no"
     fi
 
